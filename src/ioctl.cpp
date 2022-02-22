@@ -9,7 +9,7 @@ bool isInteger(const Napi::Value& val) {
     return false;
   }
 
-  double d = val.ToNumber().DoubleValue();
+  double d = val.ToNumber().Unwrap().DoubleValue();
   return static_cast<double>(static_cast<int64_t>(d)) == d;
 }
 
@@ -38,7 +38,7 @@ Napi::Number Ioctl(const Napi::CallbackInfo& info) {
 
   if ((length == 3) && !info[2].IsUndefined()) {
     if (isInteger(info[2])) {
-      argp = reinterpret_cast<void*>(info[2].ToNumber().Int32Value());
+      argp = reinterpret_cast<void*>(info[2].ToNumber().Unwrap().Int32Value());
     } else if (info[2].IsBuffer()) {
       argp = info[2].As<Napi::Buffer<unsigned char>>().Data();
     } else {
@@ -48,9 +48,9 @@ Napi::Number Ioctl(const Napi::CallbackInfo& info) {
     }
   }
 
-  int fd = info[0].ToNumber().Int32Value();
+  int fd = info[0].ToNumber().Unwrap().Int32Value();
   unsigned long request =
-      static_cast<unsigned long>(info[1].ToNumber().DoubleValue());
+      static_cast<unsigned long>(info[1].ToNumber().Unwrap().DoubleValue());
 
   int res = ioctl(fd, request, argp);
   if (res < 0) {
